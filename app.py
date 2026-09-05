@@ -1,2 +1,2 @@
 import streamlit as st
-st.title("My Streamlit App")
+st.title("welcome to sam application")
