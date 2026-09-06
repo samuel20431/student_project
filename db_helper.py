@@ -18,3 +18,10 @@ def create_table():
     ''')
     conn.commit()
     conn.close()
+
+def add_student(username, password):
+    conn = create_connection()
+    cursor = conn.cursor()
+    cursor.execute('INSERT INTO students (username, password) VALUES (?, ?)', (username, password))
+    conn.commit()
+    conn.close()
