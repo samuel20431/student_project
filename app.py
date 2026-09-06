@@ -2,15 +2,15 @@ import streamlit as st
 st.title("login page")
 class login:
     status = "active"
-    def __init__(self, username,password,mark):
+    def __init__(self, username,password):
         self.username = username
         self.password = password
-        self.mark = mark 
+         
 
     def get_total(self):
         return sum(self.mark)
 
-result = login("samuel","samuel123",{48,96,80,86,97})
+result = login("samuel","samuel123")
 print(result.username)
 print(result.password)
 print("total mark",result.get_total())
