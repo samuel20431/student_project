@@ -13,4 +13,3 @@ class login:
 result = login("samuel","samuel123")
 print(result.username)
 print(result.password)
-print("total mark",result.get_total())
