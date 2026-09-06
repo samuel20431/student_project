@@ -1,7 +1,7 @@
 from ast import main
 
 import streamlit as st
-from db_helper import create_table, add_student
+from db_helper import create_table, add_student, verify_student
 
 
 def main():
@@ -12,6 +12,12 @@ def main():
         st.subheader("Login")
         username = st.text_input("Username")
         password = st.text_input("Password", type="password")
+        if st.button("Login"):
+            if username and password:
+                if verify_student(username, password):
+                    st.success("You have successfully logged in!")
+                else:
+                    st.warning("Invalid username or password. Please try again.")
     elif choice == "Register":
         st.subheader("Register")
         username = st.text_input("Username")

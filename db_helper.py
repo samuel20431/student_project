@@ -24,3 +24,11 @@ def add_student(username, password):
     cursor.execute('INSERT INTO students (username, password) VALUES (?, ?)', (username, password))
     conn.commit()
     conn.close()
+
+def verify_student(username, password):
+    conn = create_connection()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM students WHERE username = ? AND password = ?', (username, password))
+    student = cursor.fetchone()
+    conn.close()
+    return student is not None
