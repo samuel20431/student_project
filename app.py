@@ -17,11 +17,11 @@ def main():
         username = st.text_input("Username")
         password = st.text_input("Password", type="password")    
         if st.button("Register"):
-            add_student(username, password)
-            st.success("You have successfully registered!")
-        else:
-            st.warning("username already exists. Please choose a different username.")
-
+            if username and password:
+                if add_student(username, password):
+                    st.success("You have successfully registered!")
+                else:
+                    st.warning("Username already exists. Please choose a different username.")
 
 if __name__ == "__main__":
     main()
