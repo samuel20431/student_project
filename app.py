@@ -1,15 +1,12 @@
+from ast import main
+
 import streamlit as st
-st.title("login page")
-class login:
-    status = "active"
-    def __init__(self, username,password):
-        self.username = username
-        self.password = password
-         
+from db_helper import create_table,verify_user,fetch_user
 
-    def get_total(self):
-        return sum(self.mark)
 
-result = login("samuel","samuel123")
-print(result.username)
-print(result.password)
+def main():
+    create_table()
+st.title("Student Login System")
+
+if __name__ == "__main__":
+    main()
