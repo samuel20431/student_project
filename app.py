@@ -1,7 +1,7 @@
 from ast import main
 
 import streamlit as st
-from db_helper import create_table,verify_user,fetch_user
+from db_helper import create_table
 
 
 def main():
