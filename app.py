@@ -1,34 +1,33 @@
-import sqlite3
+from ast import main
 
-database = 'students.db'
+import streamlit as st  # type: ignore[import-not-found]
+from db_helper import create_table, add_student, verify_student
 
-def create_connection():
-    conn = sqlite3.connect(database)
-    return conn
 
-def create_table():
-    conn = create_connection()
-    cursor = conn.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS students (
-            username TEXT PRIMARY KEY,
-            password TEXT NOT NULL
-        )
-    ''')
-    conn.commit()
-    conn.close()
+def main():
+    create_table()
+    st.title("Student Login System")
+    choice = st.sidebar.selectbox("Select an option", ["Login", "Register"])
+    if choice == "Login":
+        st.subheader("Login")
+        username = st.text_input("Username")
+        password = st.text_input("Password", type="password")
+        if st.button("Login"):
+            if username and password:
+                if verify_student(username, password):
+                    st.success("You have successfully logged in!")
+                else:
+                    st.warning("Invalid username or password. Please try again.")
+    elif choice == "Register":
+        st.subheader("Register")
+        username = st.text_input("Username")
+        password = st.text_input("Password", type="password")    
+        if st.button("Register"):
+            if username and password:
+                if add_student(username, password):
+                    st.success("You have successfully registered!")
+                else:
+                    st.warning("Username already exists. Please choose a different username.")
 
-def add_student(username, password):
-    conn = create_connection()
-    cursor = conn.cursor()
-    cursor.execute('INSERT INTO students (username, password) VALUES (?, ?)', (username, password))
-    conn.commit()
-    conn.close()
-
-def verify_student(username, password):
-    conn = create_connection()
-    cursor = conn.cursor()
-    cursor.execute('SELECT * FROM students WHERE username = ? AND password = ?', (username, password))
-    student = cursor.fetchone()
-    conn.close()
-    return student is not None
+if __name__ == "__main__":
+    main()
