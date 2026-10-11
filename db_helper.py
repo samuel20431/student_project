@@ -1,139 +1,59 @@
-
+ #db_helper.py
 import sqlite3
-import hashlib
-import secrets
 
-DATABASE = "students.db"
+DATABASE_NAME = "users.db"
 
-
-# Connect to database
-def create_connection():
-    return sqlite3.connect(DATABASE)
-
-
-# Create students table
-def create_table():
-
-    conn = create_connection()
+def init_db():
+    """Initializes the database and creates necessary tables."""
+    conn = sqlite3.connect(DATABASE_NAME)
     cursor = conn.cursor()
-
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS students (
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
             username TEXT PRIMARY KEY,
-            password TEXT NOT NULL,
-            email TEXT NOT NULL
+            password TEXT NOT NULL
         )
-    """)
-
+    ''')
     conn.commit()
     conn.close()
 
-
-# Hash password
-def hash_password(password):
-
-    salt = secrets.token_bytes(16)
-
-    password_hash = hashlib.pbkdf2_hmac(
-        "sha256",
-        password.encode("utf-8"),
-        salt,
-        100000
-    )
-
-    return salt.hex() + ":" + password_hash.hex()
-
-
-# Check password
-def verify_password(password, saved_password):
-
+# Add a new user
+def add_user(username, password):
     try:
-
-        salt_hex, hash_hex = saved_password.split(":")
-
-        salt = bytes.fromhex(salt_hex)
-
-        password_hash = hashlib.pbkdf2_hmac(
-            "sha256",
-            password.encode("utf-8"),
-            salt,
-            100000
-        )
-
-        return secrets.compare_digest(
-            password_hash.hex(),
-            hash_hex
-        )
-
-    except Exception:
-
-        return False
-
-
-# Add student
-def add_student(username, password, email):
-
-    conn = create_connection()
-    cursor = conn.cursor()
-
-    password_hash = hash_password(password)
-
-    try:
-
-        cursor.execute("""
-            INSERT INTO students
-            (username, password, email)
-            VALUES (?, ?, ?)
-        """, (
-            username,
-            password_hash,
-            email
-        ))
-
+        conn = sqlite3.connect(DATABASE_NAME)
+        c = conn.cursor()
+        c.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, password))
         conn.commit()
-
+        conn.close()
         return True
-
     except sqlite3.IntegrityError:
-
         return False
 
-    finally:
-
-        conn.close()
-
-
-# Verify student login
-def verify_student(username, password):
-
-    conn = create_connection()
-    cursor = conn.cursor()
-
-    cursor.execute("""
-        SELECT username, password, email
-        FROM students
-        WHERE username = ?
-    """, (username,))
-
-    student = cursor.fetchone()
-
+# Verify user credentials
+def verify_user(username, password):
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    c.execute("SELECT * FROM users WHERE username = ? AND password = ?", (username, password))
+    user = c.fetchone()
     conn.close()
+    return user is not None
 
-    if student is None:
-        return None
+def fetch_users():
+    """Retrieves all users from the database."""
+    conn = sqlite3.connect(DATABASE_NAME)
+    cursor = conn.cursor()
+    cursor.execute("SELECT username, password FROM users")
+    rows = cursor.fetchall()
+    conn.close()
+    return rows
 
-    saved_username = student[0]
-    saved_password = student[1]
-    email = student[2]
-
-    if verify_password(password, saved_password):
-
-        return {
-            "username": saved_username,
-            "email": email
-        }
-
-    return None
-
-
-
+# Change a user's password
+def change_password(username, password):
+    try:
+        conn = sqlite3.connect('users.db')
+        c = conn.cursor()
+        c.execute("UPDATE users SET password = ? WHERE username = ?", (password, username))
+        conn.commit()
+        conn.close()
+        return True
+    except sqlite3.IntegrityError:
+        return False
